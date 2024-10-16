@@ -2,15 +2,34 @@
 import { useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Scrollbar from "smooth-scrollbar";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Hero = () => {
   useEffect(() => {
-    // Animasi teks masuk
+    // Initialize Smooth Scrollbar
+    const bodyScrollBar = Scrollbar.init(document.body, {
+      damping: 0.05, // Set the smoothness of the scroll
+    });
+
+    // Proxy the scroll position to GSAP
+    ScrollTrigger.scrollerProxy(document.body, {
+      scrollTop(value) {
+        if (arguments.length) {
+          bodyScrollBar.scrollTop = value!;
+        }
+        return bodyScrollBar.scrollTop;
+      },
+    });
+
+    // Refresh ScrollTrigger on update
+    bodyScrollBar.addListener(ScrollTrigger.update);
+
+    // Hero Text Animations
     gsap.fromTo(
       ".hero-text h1",
-      { opacity: 0, y: 50 }, // posisi awal
+      { opacity: 0, y: 50 },
       { opacity: 1, y: 0, duration: 1.5, delay: 0.5, ease: "power3.out" }
     );
     gsap.fromTo(
@@ -24,21 +43,22 @@ const Hero = () => {
       { opacity: 1, y: 0, duration: 1.5, delay: 1.5, ease: "power3.out" }
     );
 
-    // Animasi tulisan "Slide to Continue"
+    // Slide-to-Continue Animation
     gsap.fromTo(
       ".slide-to-continue",
-      { opacity: 0, y: 50 }, // posisi awal
+      { opacity: 0, y: 50 },
       { opacity: 1, y: 0, duration: 1.5, delay: 2, ease: "power3.out" }
     );
 
-    // Efek Parallax pada gambar latar
+    // Clip-path animation on scroll
     gsap.to(".parallax-bg", {
-      yPercent: 20,
+      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)",
       ease: "none",
       scrollTrigger: {
         trigger: ".parallax-bg",
         start: "top top",
         scrub: true,
+        scroller: document.body, // Use the scroller we defined
       },
     });
   }, []);
@@ -48,10 +68,13 @@ const Hero = () => {
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-hero-image parallax-bg bg-cover bg-fixed"
-        style={{ backgroundImage: "url('/images/bg-malang.jpg')" }}
+        style={{
+          backgroundImage: "url('/images/bg-malang.jpg')",
+          clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", // Initial clip-path
+        }}
       ></div>
 
-      {/* Overlay untuk teks */}
+      {/* Overlay for Text */}
       <div className="relative text-center text-white hero-text z-10">
         <h1 className="text-5xl font-bold mb-4">
           Selamat Datang di Discover Malang
@@ -64,7 +87,7 @@ const Hero = () => {
         </button>
       </div>
 
-      {/* Overlay hitam untuk meningkatkan kontras */}
+      {/* Overlay for contrast */}
       <div className="absolute inset-0 bg-black opacity-30"></div>
     </section>
   );

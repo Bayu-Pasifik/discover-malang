@@ -7,32 +7,32 @@ gsap.registerPlugin(ScrollTrigger);
 
 const About = () => {
   useEffect(() => {
-    const triggerElement = ".about-section"; // Selector untuk section ini
+    const triggerElement = ".about-section";
 
-    // Membuat animasi ketika bagian About terlihat
+    // Animation for section entry
     const animationTimeline = gsap.timeline({
       scrollTrigger: {
         trigger: triggerElement,
-        start: "top 75%", // Ubah dari 80% ke 75%
+        start: "top 80%",
         end: "bottom top",
         toggleActions: "play none none reverse",
       },
     });
 
-    // Animasi untuk judul
+    // Animation for title
     animationTimeline.fromTo(
       ".about-title",
       { opacity: 0, y: 50 },
       { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
     );
 
-    // Animasi untuk setiap paragraf dan gambar
+    // Animation for text and images
     const items = document.querySelectorAll(".about-item");
     items.forEach((item, index) => {
       const text = item.querySelector(".about-text");
       const image = item.querySelector(".about-image");
 
-      // Animasi untuk teks
+      // Text animation
       animationTimeline.fromTo(
         text,
         { opacity: 0, y: 50 },
@@ -40,28 +40,32 @@ const About = () => {
           opacity: 1,
           y: 0,
           duration: 0.5,
-          delay: index * 0.3, // Ganti dari 0.5 menjadi 0.3
+          delay: index * 0.3,
           ease: "power3.out",
         },
-        "-=0.1" // Tumpang tindih dengan animasi sebelumnya lebih sedikit
+        "-=0.2"
       );
 
-      // Animasi untuk gambar
+      // Image animation with clip-path
       animationTimeline.fromTo(
         image,
-        { opacity: 0, scale: 0.8 },
+        {
+          opacity: 0,
+          scale: 0.8,
+          clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
+        },
         {
           opacity: 1,
           scale: 1,
+          clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
           duration: 0.5,
-          delay: index * 0.3, // Ganti dari 0.5 menjadi 0.3
+          delay: index * 0.3,
           ease: "power3.out",
         },
-        "-=0.1"
+        "-=0.2"
       );
     });
 
-    // Cleanup untuk ScrollTrigger
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
@@ -72,8 +76,6 @@ const About = () => {
       <h2 className="about-title text-3xl font-bold text-center mb-8">
         Tentang Malang
       </h2>
-
-      {/* Gambar dan Tulisan Bergantian */}
       <div className="flex flex-col gap-12">
         {/* Baris Pertama */}
         <div className="about-item flex flex-col md:flex-row items-center justify-center">
